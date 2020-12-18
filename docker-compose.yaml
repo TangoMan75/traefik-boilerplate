@@ -1,0 +1,48 @@
+# https://computerz.solutions/docker-compose-traefik-nextcloud/
+# https://computerz.solutions/docker-compose-wordpress-nginx-et-traefik/
+version: "3.8"
+
+services:
+
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      # - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./config/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./logs:/var/log/traefik
+      - ./config/dynamic:/dynamic:ro
+      - ./config/acme.json:/acme.json
+    # labels:
+    #   traefik.enable: true
+    #   traefik.http.routers.dashboard.entrypoints: traefik
+    #   traefik.http.routers.dashboard.rule: HostRegexp(`traefik.{host:.+}`)
+    #   traefik.http.routers.dashboard.service: api@internal
+    #   traefik.http.routers.dashboard.middlewares: auth@file
+    networks:
+      - tango
+
+  # whoami:
+  #   # A container that exposes an API to show its IP address
+  #   # https://hub.docker.com/r/traefik/whoami
+  #   image: traefik/whoami
+  #   hostname: whoami
+  #   container_name: whoami
+  #   labels:
+  #     traefik.enable: true
+  #     # https://doc.traefik.io/traefik/routing/routers
+  #     traefik.http.routers.whoami.entrypoints: web
+  #     traefik.http.routers.whoami.rule: Host(`whoami.tangoman.io`)
+  #   networks:
+  #     - tango
+
+networks:
+  tango:
+    external: true
